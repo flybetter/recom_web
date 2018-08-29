@@ -1,0 +1,362 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>推荐结果分析</title>
+    <style type="text/css">
+        html {
+            height: 100%
+        }
+
+        body {
+            height: 100%;
+            margin: 0px;
+            padding: 0px
+        }
+
+        #toggleButtonContainer {
+            height: 5%
+        }
+
+        #formContainer {
+            height: 5%
+        }
+
+        #mapContainer {
+            width: 100%;
+            height: 95%;
+            overflow: hidden;
+            margin: 0;
+            font-family: "微软雅黑";
+        }
+
+        #up-map-div {
+            width: 150px;
+            height: 800px;
+            top: 80px;
+            right: 30px;
+            position: absolute;
+            overflow-y: auto;
+            z-index: 9999;
+            border: 1px solid blue;
+            background-color: #FFFFFF;
+            font-size: 13px;
+        }
+
+        #history-map-div {
+            width: 150px;
+            height: 800px;
+            top: 80px;
+            right: 200px;
+            position: absolute;
+            overflow-y: auto;
+            z-index: 9999;
+            border: 1px solid blue;
+            background-color: #FFFFFF;
+            font-size: 13px;
+        }
+
+    </style>
+
+    <script type="text/javascript"
+            src="http://api.map.baidu.com/api?v=2.0&ak=N32lyWhU7RfjrFD76cYt6jmCHGWbicbd">
+
+    </script>
+    <script type="text/javascript"
+            src="http://api.map.baidu.com/library/Heatmap/2.0/src/Heatmap_min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+
+</head>
+
+<body>
+<div id="toggleButtonContainer">
+    <button id="toggleButton">隐藏/显示 查询条件</button>
+</div>
+<div id="formContainer">
+    <form>
+        <label for="cityKey">城市:</label>
+        <select id="cityKey" name="cityKey">
+            <option value="nj">南京</option>
+        </select>
+
+        <label for="userId">用户:</label>
+        <input id="userId" name="userId"/>
+
+        <input type="hidden" id="dataType" name="dataType"/>
+
+        <input type="button" value="画像" onclick="showUserfeature()">
+
+        <label for="pageSize">pageSize</label>
+        <input id="pageSize" name="pageSize" value="20"/>
+        <label for="pageNum">pageNum</label>
+        <input id="pageNum" name="pageNum" value="1"/>
+
+        <input type="button" value="访问记录" onclick="showAccesslog()">
+        <input type="button" value="推荐结果" onclick="showRecomresult()">
+        <input type="reset" value="重置" onclick="resetAll()">
+    </form>
+</div>
+
+<div id="mapContainer"></div>
+<div id="up-map-div">
+</div>
+<div id="history-map-div">
+</div>
+
+
+<script type="text/javascript">
+    $("#toggleButton").click(function () {
+        $("#formContainer").toggle();
+    });
+
+    // 创建地图实例
+    var map = new BMap.Map("mapContainer");
+    // 创建点坐标
+    var initCenterPoint = new BMap.Point(118.7906697345, 32.0478554409);
+    // 初始化地图，设置中心点坐标和地图级别
+    map.centerAndZoom(initCenterPoint, 11);
+    // 开启鼠标滚轮缩放
+    map.enableScrollWheelZoom(true);
+    // 添加平移缩放控件
+    map.addControl(new BMap.NavigationControl());
+    // 添加比例尺
+    map.addControl(new BMap.ScaleControl());
+
+    function resetAll() {
+        // 清除地图上所有覆盖物
+        map.clearOverlays();
+        // 初始化地图，设置中心点坐标和地图级别
+        map.centerAndZoom(initCenterPoint, 11);
+        $('#up-map-div').empty();
+        $('#history-map-div').empty();
+    }
+
+    function showAccesslog() {
+        $("#dataType").val("accesslog");
+        var phone = $("#userId").val()
+        $.ajax({
+            type: "get",
+            dataType: "html",
+            url: '/map/' + phone + '/history',
+            success: function (data) {
+                var response = JSON.parse(data)
+                if (response.status == -2) {
+                    alert("无数据!")
+                } else {
+                    $('#history-map-div').empty();
+                    for (var index = 0; index < response.poiTotalCount;
+                         index++) {
+                        var poi = response.pois[index];
+                        console.info(poi)
+                        // 创建点坐标
+                        var point = new BMap.Point(poi.lng, poi.lat);
+                        // 创建标注
+                        var marker = new BMap.Marker(point);
+                        // 将标注添加到地图中
+                        map.addOverlay(marker);
+                        // 设置覆盖物的文字标签
+                        var labelContent = "";
+                        if (poi.isNewHouse == "1") {
+                            labelContent += "LOG 新房"
+                                + "<br />";
+                            labelContent += "小区:"
+                                + poi.blockName
+                                + "<br />";
+                            labelContent += "均价:"
+                                + poi.averPrice
+                                + "<br />";
+                            labelContent += "访问次数:"
+                                + poi.visitCount
+                                + "<br />";
+                        } else {
+                            labelContent += "LOG 二手房"
+                                + "<br />";
+                            labelContent += "均价:"
+                                + poi.averPrice
+                                + "<br />";
+                            labelContent += "总价:"
+                                + poi.price
+                                + "<br />";
+                            labelContent += "面积:"
+                                + poi.buildArea
+                                + "<br />";
+                            labelContent += "户型:"
+                                + poi.room + "室" + poi.hall + "厅" + poi.toilet + "卫"
+                                + "<br />";
+                            labelContent += "楼层:"
+                                + poi.floor + "/" + poi.totalFloor
+                                + "<br />";
+                            labelContent += "朝向:"
+                                + poi.forward
+                                + "<br />";
+                            labelContent += "装修:"
+                                + poi.fitment
+                                + "<br />";
+                            labelContent += "年代:"
+                                + poi.buildYear
+                                + "<br />";
+                            labelContent += "房龄:"
+                                + poi.houseAge
+                                + "<br />";
+                            labelContent += "小区:"
+                                + poi.blockName
+                                + "<br />";
+                            labelContent += "区属:"
+                                + poi.district
+                                + "<br />";
+                            labelContent += "街道:"
+                                + poi.streetName
+                                + "<br />";
+                            labelContent += "访问次数:"
+                                + poi.visitCount
+                                + "<br />";
+                        }
+
+                        if (poi.blockName != undefined) {
+                            $('#history-map-div').append("<div style='border:1px solid blue;'><font color='red'>历史记录</font> <br/>" + labelContent + "</div>")
+                        }
+                        var label = new BMap.Label("历史记录", {
+                            offset: new BMap.Size(20, -10)
+                        });
+                        marker.setLabel(label);
+                    }
+                }
+            }
+        });
+    }
+
+    function showUserfeature() {
+        $("#dataType").val("userfeature");
+        $.ajax({
+            type: "get",
+            dataType: "html",
+            url: '/analysis/getData',
+            data: $("form").serialize(),
+            success: function (data) {
+                var response = $.parseJSON(data);
+                if (response.status == -2) {
+                    alert("无数据!")
+                } else {
+                    var poi = response.userFeature;
+                    // 创建点坐标
+                    var point = new BMap.Point(poi.lng, poi.lat);
+                    // 创建标注
+                    var marker = new BMap.Marker(point);
+                    // 将标注添加到地图中
+                    map.addOverlay(marker);
+                    // 设置覆盖物的文字标签
+                    var labelContent = "画像"
+                        + "<br />";
+                    labelContent += "总价:"
+                        + poi.price
+                        + "<br />";
+                    labelContent += "均价:"
+                        + poi.averPrice
+                        + "<br />";
+                    labelContent += "房间数:"
+                        + poi.room
+                        + "<br />";
+                    labelContent += "房龄:"
+                        + poi.houseAge;
+                    var label = new BMap.Label(labelContent, {
+                        offset: new BMap.Size(20, -10)
+                    });
+                    marker.setLabel(label);
+                    map.centerAndZoom(point, 11);
+                }
+            }
+        });
+    }
+
+    function showRecomresult() {
+
+        $("#dataType").val("recomresult");
+        $.ajax({
+            type: "get",
+            dataType: "html",
+            url: '/analysis/getData',
+            data: $("form").serialize(),
+            success: function (data) {
+                var response = $.parseJSON(data);
+                if (response.status == -2) {
+                    alert("无数据!")
+                } else {
+                    $('#up-map-div').empty();
+                    for (var index = 0; index < response.poiTotalCount; index++) {
+                        var poi = response.pois[index];
+                        if (poi.isNewHouse == "0" && poi.isValidHouse == "0") {
+                            // 跳过无效的二手房房源
+                            continue;
+                        }
+                        // 创建点坐标
+                        var point = new BMap.Point(poi.lng, poi.lat);
+                        // 创建标注
+                        var marker = new BMap.Marker(point);
+                        // 将标注添加到地图中
+                        map.addOverlay(marker);
+                        // 设置覆盖物的文字标签
+                        var labelContent = "";
+                        if (poi.isNewHouse == "1") {
+                            labelContent += "RES 新房"
+                                + "<br />";
+                            labelContent += "小区:"
+                                + poi.blockName
+                                + "<br />";
+                            labelContent += "均价:"
+                                + poi.averPrice
+                                + "<br />";
+                        } else {
+                            labelContent += "RES 二手房"
+                                + "<br />";
+                            labelContent += "均价:"
+                                + poi.averPrice
+                                + "<br />";
+                            labelContent += "总价:"
+                                + poi.price
+                                + "<br />";
+                            labelContent += "面积:"
+                                + poi.buildArea
+                                + "<br />";
+                            labelContent += "户型:"
+                                + poi.room + "室" + poi.hall + "厅" + poi.toilet + "卫"
+                                + "<br />";
+                            labelContent += "楼层:"
+                                + poi.floor + "/" + poi.totalFloor
+                                + "<br />";
+                            labelContent += "朝向:"
+                                + poi.forward
+                                + "<br />";
+                            labelContent += "装修:"
+                                + poi.fitment
+                                + "<br />";
+                            labelContent += "年代:"
+                                + poi.buildYear
+                                + "<br />";
+                            labelContent += "房龄:"
+                                + poi.houseAge
+                                + "<br />";
+                            labelContent += "小区:"
+                                + poi.blockName
+                                + "<br />";
+                            labelContent += "区属:"
+                                + poi.district
+                                + "<br />";
+                            labelContent += "街道:"
+                                + poi.streetName
+                                + "<br />";
+                        }
+                        $('#up-map-div').append("<div style='border:1px solid blue;'><font color='red'>推荐序列" + index + "</font> <br/>" + labelContent + "</div>")
+
+                        var label = new BMap.Label("推荐序列" + index, {
+                            offset: new BMap.Size(20, -10)
+                        });
+                        marker.setLabel(label);
+                    }
+                }
+            }
+        });
+    }
+</script>
+</body>
+</html>

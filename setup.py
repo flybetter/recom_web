@@ -10,5 +10,8 @@ setup(
     description="show the 365company's data",
     install_requires=[
         'flask',
+        'urllib3',
+        'numpy',
+        'pandas',
     ]
 )
