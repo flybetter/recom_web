@@ -1,5 +1,3 @@
-import io
-
 from setuptools import find_packages, setup
 
 setup(
@@ -13,5 +11,6 @@ setup(
         'urllib3',
         'numpy',
         'pandas',
+        'cx_Oracle'
     ]
 )
