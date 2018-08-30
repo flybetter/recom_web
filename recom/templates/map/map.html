@@ -81,7 +81,30 @@
         </select>
 
         <label for="userId">用户:</label>
-        <input id="userId" name="userId"/>
+        <select name="userId" id="userId">
+            <option value="15077827585">15077827585</option>
+            <option value="13770324189">13770324189</option>
+            <option value="13675189197">13675189197</option>
+            <option value="13601901399">13601901399</option>
+            <option value="17855106781">17855106781</option>
+
+            <option value="15905175211">15905175211</option>
+            <option value="13390901599">13390901599</option>
+            <option value="15951001888">15951001888</option>
+            <option value="15850780069">15850780069</option>
+
+            <option value="13851499283">13851499283</option>
+            <option value="13401952869">13401952869</option>
+            <option value="18951603156">18951603156</option>
+            <option value="18051082210">18051082210</option>
+            <option value="15295123506">15295123506</option>
+
+            <option value="15105198373">15105198373</option>
+            <option value="13913993926">13913993926</option>
+            <option value="17302584660">17302584660</option>
+            <option value="18055500055">18055500055</option>
+        </select>
+        {#        <input id="userId" name="userId" value="15077827585"/>#}
 
         <input type="hidden" id="dataType" name="dataType"/>
 
@@ -140,11 +163,16 @@
             dataType: "html",
             url: '/map/' + phone + '/history',
             success: function (data) {
-                var response = JSON.parse(data)
+                try {
+                    var response = JSON.parse(data)
+                } catch (e) {
+                    alert(data)
+                }
                 if (response.status == -2) {
                     alert("无数据!")
                 } else {
                     $('#history-map-div').empty();
+                    {#deletePointHistory()#}
                     for (var index = 0; index < response.poiTotalCount;
                          index++) {
                         var poi = response.pois[index];
@@ -214,9 +242,9 @@
                         }
 
                         if (poi.blockName != undefined) {
-                            $('#history-map-div').append("<div style='border:1px solid blue;'><font color='red'>历史记录</font> <br/>" + labelContent + "</div>")
+                            $('#history-map-div').append("<div style='border:1px solid blue;'><font color='red'>历史记录" + index + "</font> <br/>" + labelContent + "</div>")
                         }
-                        var label = new BMap.Label("历史记录", {
+                        var label = new BMap.Label("历史记录" + index, {
                             offset: new BMap.Size(20, -10)
                         });
                         marker.setLabel(label);
@@ -269,20 +297,51 @@
         });
     }
 
-    function showRecomresult() {
+    function deletePoint() {
+        var allOverlay = map.getOverlays();
+        for (var i = 0; i < allOverlay.length; i++) {
+            if (allOverlay[i].toString() == "[object Marker]") {
+                var point = allOverlay[i].getLabel().content; //获取marker的位置
+                if (point.substr(0, 4) == "推荐序列") {
+                    console.info(point)
+                    map.removeOverlay(allOverlay[i]);
+                }
+            }
+        }
+    }
 
+    function deletePointHistory() {
+        var allOverlay = map.getOverlays();
+        for (var i = 0; i < allOverlay.length; i++) {
+            if (allOverlay[i].toString() == "[object Marker]") {
+                var point = allOverlay[i].getLabel().content; //获取marker的位置
+                if (point.substr(0, 4) == "历史记录") {
+                    console.info(point)
+                    map.removeOverlay(allOverlay[i]);
+                }
+            }
+        }
+    }
+
+    function showRecomresult() {
         $("#dataType").val("recomresult");
+        var phone = $("#userId").val()
         $.ajax({
             type: "get",
             dataType: "html",
-            url: '/analysis/getData',
-            data: $("form").serialize(),
+            url: '/map/' + phone + '/recom',
             success: function (data) {
-                var response = $.parseJSON(data);
+                try {
+                    var response = JSON.parse(data)
+                } catch (e) {
+                    alert(data)
+                }
                 if (response.status == -2) {
                     alert("无数据!")
                 } else {
                     $('#up-map-div').empty();
+                    {#deletePoint();#}
+
                     for (var index = 0; index < response.poiTotalCount; index++) {
                         var poi = response.pois[index];
                         if (poi.isNewHouse == "0" && poi.isValidHouse == "0") {
@@ -348,7 +407,7 @@
                         }
                         $('#up-map-div').append("<div style='border:1px solid blue;'><font color='red'>推荐序列" + index + "</font> <br/>" + labelContent + "</div>")
 
-                        var label = new BMap.Label("推荐序列" + index, {
+                        var label = new BMap.Label("推荐序列***" + index, {
                             offset: new BMap.Size(20, -10)
                         });
                         marker.setLabel(label);
