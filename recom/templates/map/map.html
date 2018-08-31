@@ -164,7 +164,6 @@
 
 
     function recom_map() {
-        console.log(11)
         var phone = $("#userId").val()
         $.ajax({
             type: "get",
@@ -201,7 +200,7 @@
                     alert("无数据!")
                 } else {
                     $('#history-map-div').empty();
-                    {#deletePointHistory()#}
+                    deletePointHistory()
                     for (var index = 0; index < response.poiTotalCount;
                          index++) {
                         var poi = response.pois[index];
@@ -331,7 +330,7 @@
         for (var i = 0; i < allOverlay.length; i++) {
             if (allOverlay[i].toString() == "[object Marker]") {
                 var point = allOverlay[i].getLabel().content; //获取marker的位置
-                if (point.substr(0, 4) == "推荐序列") {
+                if (point !=null && point.substr(0, 4) == "推荐序列") {
                     console.info(point)
                     map.removeOverlay(allOverlay[i]);
                 }
@@ -344,7 +343,7 @@
         for (var i = 0; i < allOverlay.length; i++) {
             if (allOverlay[i].toString() == "[object Marker]") {
                 var point = allOverlay[i].getLabel().content; //获取marker的位置
-                if (point.substr(0, 4) == "历史记录") {
+                if (point !=null && point.substr(0, 4) == "历史记录") {
                     console.info(point)
                     map.removeOverlay(allOverlay[i]);
                 }
@@ -369,8 +368,7 @@
                     alert("无数据!")
                 } else {
                     $('#up-map-div').empty();
-                    {#deletePoint();#}
-
+                    deletePoint();
                     for (var index = 0; index < response.poiTotalCount; index++) {
                         var poi = response.pois[index];
                         if (poi.isNewHouse == "0" && poi.isValidHouse == "0") {

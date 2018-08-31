@@ -23,9 +23,9 @@ def readCSV(phone):
 
 def secondHouseRequest(contentIds):
     df = pd.DataFrame(columns=['id', 'price', 'blockname'], dtype=np.int8)
-    logging.debug(ESF_URL + contentIds)
     for i in range(0, len(contentIds), 350):
-        tempContentIds = contentIds[i:i + 350]
+        tempContentIds = ",".join(contentIds[i:i + 350])
+        logging.debug(ESF_URL + tempContentIds)
         response = request.urlopen(ESF_URL + tempContentIds)
         response = response.read().decode('utf-8')
         logging.info(response)
@@ -39,13 +39,13 @@ def secondHouseRequest(contentIds):
 
 
 def secondHouseRequest2(contentIds):
-    logging.debug(ESF_URL + contentIds)
     resultMap = dict()
     resultMap['cityCenter'] = '{"lat": 32.0647517242,"lng": 118.8029140176}'
     resultMap['poiTotalCount'] = len(contentIds)
     temp_list = list()
     for i in range(0, len(contentIds), 350):
-        tempContentIds = contentIds[i:i + 350]
+        tempContentIds = ",".join(contentIds[i:i + 350])
+        logging.debug(ESF_URL + tempContentIds)
         response = request.urlopen(ESF_URL + tempContentIds)
         response = response.read().decode('utf-8')
         logging.info(response)
@@ -119,9 +119,7 @@ def historyDataFrame(response):
 
 
 def get_contentIds(data):
-    contentIds = ",".join(data["contentId"])
-    logging.debug(contentIds)
-    return contentIds
+    return data["contentId"]
 
 
 def relative_blocks(blockname):
@@ -237,14 +235,14 @@ def get_associate_community(phone):
 
 
 if __name__ == '__main__':
-    # datas = startup("18055500055")
-    # if type(datas) == str:
-    #     print(datas)
-    # else:
-    #     secondHouseRequestJson(datas)
+    datas = startup("13913993926")
+    if type(datas) == str:
+        print(datas)
+    else:
+        secondHouseRequestJson(datas)
 
-    # print(get_history("18055500055"))
+    # print(get_history("13913993926"))
 
     # print(getBlockCoord("天润城第十四街区"))
 
-    print(get_associate_community("18055500055"))
+    # print(get_associate_community("18055500055"))
