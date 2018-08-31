@@ -118,6 +118,7 @@
         <input type="button" value="访问记录" onclick="showAccesslog()">
         <input type="button" value="推荐结果" onclick="showRecomresult()">
         <input type="reset" value="重置" onclick="resetAll()">
+        <input type="button" value="推荐图谱的推荐" onclick="recom_map()">
     </form>
 </div>
 
@@ -127,6 +128,12 @@
 <div id="history-map-div">
 </div>
 
+<table id="recom_map" name="recom_map" border="1">
+    <tr>
+    <td>历史记录的小区</td>
+    <td>关联的小区</td>
+    </tr>
+</table>
 
 <script type="text/javascript">
     $("#toggleButton").click(function () {
@@ -153,6 +160,28 @@
         map.centerAndZoom(initCenterPoint, 11);
         $('#up-map-div').empty();
         $('#history-map-div').empty();
+    }
+
+
+    function recom_map() {
+        console.log(11)
+        var phone = $("#userId").val()
+        $.ajax({
+            type: "get",
+            dataType: "html",
+            url: '/map/' + phone + '/associated_community',
+            success: function (data) {
+                try {
+                    var response = JSON.parse(data)
+                } catch (e) {
+                    alert(data)
+                }
+                for (var i in response) {
+                    $("#recom_map").append("<tr><td>" + i + "</td><td>" + response[i] + "</td></tr>")
+                }
+            }
+        });
+
     }
 
     function showAccesslog() {

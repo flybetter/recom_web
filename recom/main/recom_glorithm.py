@@ -31,8 +31,10 @@ def secondHouseRequest(contentIds):
         logging.info(response)
         if response != '-1':
             jsonObjects = json.loads(response)
-            for i, object in enumerate(jsonObjects):
-                df.loc[i] = [object['id'], float(object['price']), object['blockinfo']['blockname']]
+            for object in jsonObjects:
+                df = df.append(
+                    pd.Series([object['id'], float(object['price']), object['blockinfo']['blockname']],
+                              index=['id', 'price', 'blockname']), ignore_index=True)
     return df
 
 
@@ -50,7 +52,6 @@ def secondHouseRequest2(contentIds):
         if response != '-1':
             jsonObjects = json.loads(response)
             for object in jsonObjects:
-                print(object)
                 temp = dict()
                 if "lat" not in object["blockinfo"] or object["blockinfo"]["lat"] == "":
                     block = getBlockCoord(object["blockinfo"]["blockname"])
@@ -144,16 +145,6 @@ def statistical(df):
         return "no relative block name"
 
 
-def startup(phone):
-    data = readCSV(phone)
-    contentIds = get_contentIds(data)
-    secondHouseData = secondHouseRequest(contentIds)
-    if secondHouseData.empty:
-        return "no history"
-    else:
-        return statistical(secondHouseData)
-
-
 def secondHouseRequestJson(datas):
     data = map(lambda x: str(x[0]), datas)
     URL = ",".join(list(data))
@@ -222,6 +213,29 @@ def getBlockCoord(blockName):
         return None
 
 
+def startup(phone):
+    data = readCSV(phone)
+    contentIds = get_contentIds(data)
+    secondHouseData = secondHouseRequest(contentIds)
+    if secondHouseData.empty:
+        return "no history"
+    else:
+        return statistical(secondHouseData)
+
+
+def get_associate_community(phone):
+    result = dict()
+    data = readCSV(phone)
+    contentIds = get_contentIds(data)
+    secondHouseData = secondHouseRequest(contentIds)
+    if secondHouseData.empty:
+        return "no history"
+    else:
+        for name in secondHouseData['blockname'].unique():
+            result[name] = relative_blocks(name)
+        return json.dumps(result, ensure_ascii=False)
+
+
 if __name__ == '__main__':
     # datas = startup("18055500055")
     # if type(datas) == str:
@@ -229,6 +243,8 @@ if __name__ == '__main__':
     # else:
     #     secondHouseRequestJson(datas)
 
-    print(get_history("18055500055"))
+    # print(get_history("18055500055"))
 
     # print(getBlockCoord("天润城第十四街区"))
+
+    print(get_associate_community("18055500055"))

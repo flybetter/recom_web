@@ -2,7 +2,7 @@ from flask import render_template, Blueprint
 
 from urllib import request
 import json
-from recom.main.recom_glorithm import startup, secondHouseRequestJson, get_history
+from recom.main.recom_glorithm import startup, secondHouseRequestJson, get_history, get_associate_community
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
@@ -31,3 +31,8 @@ def recom(phone):
         datas = secondHouseRequestJson(datas)
     logging.debug(datas)
     return datas
+
+
+@bp.route('/<string:phone>/associated_community', methods=('GET', 'POST'))
+def associated_community(phone):
+    return get_associate_community(phone)
