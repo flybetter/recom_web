@@ -82,27 +82,41 @@
 
         <label for="userId">用户:</label>
         <select name="userId" id="userId">
+{#            <option value="15077827585">15077827585</option>#}
+{#            <option value="13770324189">13770324189</option>#}
+{#            <option value="13675189197">13675189197</option>#}
+{#            <option value="13601901399">13601901399</option>#}
+{#            <option value="17855106781">17855106781</option>#}
+{##}
+{#            <option value="15905175211">15905175211</option>#}
+{#            <option value="13390901599">13390901599</option>#}
+{#            <option value="15951001888">15951001888</option>#}
+{#            <option value="15850780069">15850780069</option>#}
+{##}
+{#            <option value="13851499283">13851499283</option>#}
+{#            <option value="13401952869">13401952869</option>#}
+{#            <option value="18951603156">18951603156</option>#}
+{#            <option value="18051082210">18051082210</option>#}
+{#            <option value="15295123506">15295123506</option>#}
+{##}
+{#            <option value="15105198373">15105198373</option>#}
+{#            <option value="13913993926">13913993926</option>#}
+{#            <option value="17302584660">17302584660</option>#}
+{#            <option value="18055500055">18055500055</option>#}
+
+
+            <option value="13901584306">13901584306</option>
+            <option value="13776649100">13776649100</option>
+            <option value="13813872389">13813872389</option>
+            <option value="13160083760">13160083760</option>
+            <option value="13813098200">13813098200</option>
+            <option value="13072513998">13072513998</option>
+            <option value="18913985286">18913985286</option>
+            <option value="15861810830">15861810830</option>
             <option value="15077827585">15077827585</option>
-            <option value="13770324189">13770324189</option>
-            <option value="13675189197">13675189197</option>
-            <option value="13601901399">13601901399</option>
-            <option value="17855106781">17855106781</option>
-
-            <option value="15905175211">15905175211</option>
-            <option value="13390901599">13390901599</option>
-            <option value="15951001888">15951001888</option>
-            <option value="15850780069">15850780069</option>
-
-            <option value="13851499283">13851499283</option>
-            <option value="13401952869">13401952869</option>
-            <option value="18951603156">18951603156</option>
-            <option value="18051082210">18051082210</option>
-            <option value="15295123506">15295123506</option>
-
-            <option value="15105198373">15105198373</option>
-            <option value="13913993926">13913993926</option>
-            <option value="17302584660">17302584660</option>
-            <option value="18055500055">18055500055</option>
+            <option value="18551823217">18551823217</option>
+            <option value="13951937782">13951937782</option>
+            <option value="15077827585">15077827585</option>
         </select>
         {#        <input id="userId" name="userId" value="15077827585"/>#}
 
@@ -130,8 +144,8 @@
 
 <table id="recom_map" name="recom_map" border="1">
     <tr>
-    <td>历史记录的小区</td>
-    <td>关联的小区</td>
+        <td>历史记录的小区</td>
+        <td>关联的小区</td>
     </tr>
 </table>
 
@@ -328,9 +342,9 @@
     function deletePoint() {
         var allOverlay = map.getOverlays();
         for (var i = 0; i < allOverlay.length; i++) {
-            if (allOverlay[i].toString() == "[object Marker]") {
+            if (allOverlay[i].toString() == "[object Marker]" && allOverlay[i].getLabel() != null) {
                 var point = allOverlay[i].getLabel().content; //获取marker的位置
-                if (point !=null && point.substr(0, 4) == "推荐序列") {
+                if (point != null && point.substr(0, 4) == "推荐序列") {
                     console.info(point)
                     map.removeOverlay(allOverlay[i]);
                 }
@@ -341,9 +355,9 @@
     function deletePointHistory() {
         var allOverlay = map.getOverlays();
         for (var i = 0; i < allOverlay.length; i++) {
-            if (allOverlay[i].toString() == "[object Marker]") {
+            if (allOverlay[i].toString() == "[object Marker]" && allOverlay[i].getLabel() != null) {
                 var point = allOverlay[i].getLabel().content; //获取marker的位置
-                if (point !=null && point.substr(0, 4) == "历史记录") {
+                if (point != null && point.substr(0, 4) == "历史记录") {
                     console.info(point)
                     map.removeOverlay(allOverlay[i]);
                 }

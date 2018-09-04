@@ -11,12 +11,15 @@ logging.basicConfig(level=logging.DEBUG)
 
 ESF_URL = 'http://mapi.house365.com/taofang/v1.0/esf/?method=getHouseListNew&name=HouseSellEX&city=nj&id='
 
+CSV_file = "select_DEVICE_ID_CONTEXT_ID__from_DWB_DA_2018-9-4.csv"
+
 
 def readCSV(phone):
     deviceid = relation(phone)
-    filepath = approot.get_dataset("select_DEVICE_ID_CONTEXT_ID__from_DWB_DA.csv")
+    filepath = approot.get_dataset(CSV_file)
     data = pd.read_csv(filepath)
     data.columns = ['deviceId', 'contentId']
+    data['deviceId']=data['deviceId'].astype(str)
     data = data[data['deviceId'] == deviceid]
     return data
 
@@ -106,6 +109,19 @@ def relation(phone):
     relations["17302584660"] = "864032031775743"
     relations["18055500055"] = "865032030154899"
 
+    relations["13901584306"] = "868299031022147"
+    relations["13776649100"] = "861005038488224"
+    relations["13813872389"] = "866783039889666"
+    relations["13160083760"] = "866089030512111"
+    relations["13813098200"] = "869296028702318"
+    relations["13072513998"] = "862913030934831"
+    relations["18913985286"] = "866953031125431"
+    relations["15861810830"] = "868860038884787"
+    relations["15077827585"] = "864621038192553"
+    relations["18551823217"] = "862119035787782"
+    relations["13951937782"] = "864033034181608"
+    relations["15077827585"] = "864621038192553"
+
     return relations[phone]
 
 
@@ -188,9 +204,10 @@ def secondHouseRequestJson(datas):
 
 def get_history(phone):
     deviceid = relation(phone)
-    filepath = approot.get_dataset("select_DEVICE_ID_CONTEXT_ID__from_DWB_DA.csv")
-    data = pd.read_csv(filepath)
+    filepath = approot.get_dataset(CSV_file)
+    data = pd.read_csv(filepath, header=None)
     data.columns = ['deviceId', 'contentId']
+    data['deviceId'] = data['deviceId'].astype(str)
     data = data[data['deviceId'] == deviceid]
     contentIds = get_contentIds(data)
     secondHouseData = secondHouseRequest2(contentIds)
@@ -235,13 +252,13 @@ def get_associate_community(phone):
 
 
 if __name__ == '__main__':
-    datas = startup("13913993926")
-    if type(datas) == str:
-        print(datas)
-    else:
-        secondHouseRequestJson(datas)
+    # datas = startup("13913993926")
+    # if type(datas) == str:
+    #     print(datas)
+    # else:
+    #     secondHouseRequestJson(datas)
 
-    # print(get_history("13913993926"))
+    print(get_history("13901584306"))
 
     # print(getBlockCoord("天润城第十四街区"))
 
