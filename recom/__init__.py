@@ -9,8 +9,10 @@ def create_app():
         return "hello world"
 
     from recom.main import map
+    from recom.main import newhouse
 
     app.register_blueprint(map.bp)
+    app.register_blueprint(newhouse.new_house)
 
     return app
 

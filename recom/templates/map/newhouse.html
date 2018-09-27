@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>推荐结果分析</title>
+    <style type="text/css">
+        html {
+            height: 100%
+        }
+
+        body {
+            height: 100%;
+            margin: 0px;
+            padding: 0px
+        }
+
+        #mapContainer {
+            width: 100%;
+            height: 95%;
+            overflow: hidden;
+            margin: 0;
+            font-family: "微软雅黑";
+        }
+
+        #history-map-div {
+            width: 150px;
+            height: 800px;
+            top: 80px;
+            right: 30px;
+            position: absolute;
+            overflow-y: auto;
+            z-index: 9999;
+            border: 1px solid blue;
+            background-color: #FFFFFF;
+            font-size: 13px;
+        }
+
+    </style>
+
+    <script type="text/javascript"
+            src="http://api.map.baidu.com/api?v=2.0&ak=N32lyWhU7RfjrFD76cYt6jmCHGWbicbd">
+
+    </script>
+    <script type="text/javascript"
+            src="http://api.map.baidu.com/library/Heatmap/2.0/src/Heatmap_min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+
+</head>
+
+<body>
+<div id="formContainer">
+    <table border="1">
+        <tr>
+            <td rowspan="3">城市:南京</td>
+            <td>用户:</td>
+            <td>${userId}</td>
+            <td colspan="4">用户画像</td>
+        </tr>
+        <tr>
+            <td>访问记录:</td>
+            <td>新房(${num})</td>
+            <td>总价范围</td>
+            <td></td>
+            <td>户型范围</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>记录访问:</td>
+            <td>最近一个月</td>
+            <td>均价范围</td>
+            <td>${averPrice}</td>
+            <td>面积范围</td>
+            <td></td>
+        </tr>
+    </table>
+</div>
+
+<div id="mapContainer"></div>
+<div id="history-map-div">
+</div>
+<script type="text/javascript">
+    // 创建地图实例
+    var map = new BMap.Map("mapContainer");
+    // 创建点坐标
+    var initCenterPoint = new BMap.Point(118.7906697345, 32.0478554409);
+    // 初始化地图，设置中心点坐标和地图级别
+    map.centerAndZoom(initCenterPoint, 14);
+    // 开启鼠标滚轮缩放
+    map.enableScrollWheelZoom(true);
+    // 添加平移缩放控件
+    map.addControl(new BMap.NavigationControl());
+    // 添加比例尺
+    map.addControl(new BMap.ScaleControl());
+    json =
+    {{ newhouses|tojson }}
+    var response = JSON.parse(json)
+    $('#history-map-div').empty();
+    for (var index = 0; index < response.length; index++) {
+        var poi = response[index];
+        // 创建点坐标
+        var point = new BMap.Point(poi.B_LNG, poi.B_LAT);
+        // 创建标注
+        var marker = new BMap.Marker(point);
+        // 将标注添加到地图中
+        map.addOverlay(marker);
+        // 设置覆盖物的文字标签
+        var labelContent = "";
+        labelContent += "LOG 新房"
+            + "<br />";
+        labelContent += "小区id:"
+            + poi.CONTEXT
+            + "<br />";
+        labelContent += "小区:"
+            + poi.PRJ_ITEMNAME
+            + "<br />";
+        labelContent += "均价:"
+            + poi.PRICE_SHOW
+            + "<br />";
+        labelContent += "楼盘访问次数:"
+            + poi.PRJ_VIEWS
+            + "<br />";
+        labelContent += "访问日期:" + new Date(poi.DATA_DATE).toLocaleString() + "<br />";
+        $('#history-map-div').append("<div style='border:1px solid blue;'><font color='red'>新房历史记录" + index + "</font> <br/>" + labelContent + "</div>")
+        var label = new BMap.Label("新房历史记录" + index, {
+            offset: new BMap.Size(20, -10)
+        });
+        marker.setLabel(label);
+    }
+
+
+</script>
+</body>
+</html>

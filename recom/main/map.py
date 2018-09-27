@@ -29,7 +29,6 @@ def recom(phone):
     datas = startup(phone)
     if type(datas) != str:
         datas = secondHouseRequestJson(datas)
-    logging.debug(datas)
     return datas
 
 
