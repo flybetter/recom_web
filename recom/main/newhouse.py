@@ -30,20 +30,23 @@ def newhouse(phone, num):
         datas = r.lrange(NEWHOUSELOG_PREFIX + deviceid.decode('utf-8'), 0, num)
         for data in datas:
             result.extend(json.loads(data.decode('utf-8')))
-    return render_template("map/newhouse.html", newhouses=json.dumps(result, ensure_ascii=False), userId=deviceid,
+
+    return render_template("map/newhouse.html", newhouses=json.dumps(result, ensure_ascii=False),
+                           userId=phone.replace(phone[4:7], '****'),
                            num=num)
 
 
 if __name__ == '__main__':
     phone = '13851729904'
-    deviceids = r.smembers(PHONEDEVICE_PREFIX + phone)
-    for deviceid in deviceids:
-        print(deviceid.decode('utf-8'))
-        num = 30
-        result = list()
-        datas = r.lrange(NEWHOUSELOG_PREFIX + deviceid.decode('utf-8'), 0, num)
-        for data in datas:
-            print(data.decode('utf-8'))
-            result.extend(json.loads(data.decode('utf-8')))
-
-        print(json.dumps(result, ensure_ascii=False))
+    print(phone.replace(phone[4:7], '****'))
+    # deviceids = r.smembers(PHONEDEVICE_PREFIX + phone)
+    # for deviceid in deviceids:
+    #     print(deviceid.decode('utf-8'))
+    #     num = 30
+    #     result = list()
+    #     datas = r.lrange(NEWHOUSELOG_PREFIX + deviceid.decode('utf-8'), 0, num)
+    #     for data in datas:
+    #         print(data.decode('utf-8'))
+    #         result.extend(json.loads(data.decode('utf-8')))
+    #
+    #     print(json.dumps(result, ensure_ascii=False))

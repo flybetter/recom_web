@@ -54,12 +54,12 @@
         <tr>
             <td rowspan="3">城市:南京</td>
             <td>用户:</td>
-            <td>${userId}</td>
+            <td>{{ userId }}</td>
             <td colspan="4">用户画像</td>
         </tr>
         <tr>
             <td>访问记录:</td>
-            <td>新房(${num})</td>
+            <td>新房</td>
             <td>总价范围</td>
             <td></td>
             <td>户型范围</td>
@@ -69,7 +69,7 @@
             <td>记录访问:</td>
             <td>最近一个月</td>
             <td>均价范围</td>
-            <td>${averPrice}</td>
+            <td></td>
             <td>面积范围</td>
             <td></td>
         </tr>
@@ -80,6 +80,11 @@
 <div id="history-map-div">
 </div>
 <script type="text/javascript">
+    function FormatDate(strTime) {
+        var date = new Date(strTime);
+        return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+    }
+
     // 创建地图实例
     var map = new BMap.Map("mapContainer");
     // 创建点坐标
@@ -109,18 +114,18 @@
         labelContent += "LOG 新房"
             + "<br />";
         labelContent += "小区id:"
-            + poi.CONTEXT
+            + (poi.CONTEXT || '')
             + "<br />";
         labelContent += "小区:"
-            + poi.PRJ_ITEMNAME
+            + (poi.PRJ_ITEMNAME || '')
             + "<br />";
         labelContent += "均价:"
-            + poi.PRICE_SHOW
+            + (poi.PRICE_SHOW || '')
             + "<br />";
         labelContent += "楼盘访问次数:"
-            + poi.PRJ_VIEWS
+            + (poi.PRJ_VIEWS || '')
             + "<br />";
-        labelContent += "访问日期:" + new Date(poi.DATA_DATE).toLocaleString() + "<br />";
+        labelContent += "访问日期:" + FormatDate(poi.DATA_DATE) + "<br />";
         $('#history-map-div').append("<div style='border:1px solid blue;'><font color='red'>新房历史记录" + index + "</font> <br/>" + labelContent + "</div>")
         var label = new BMap.Label("新房历史记录" + index, {
             offset: new BMap.Size(20, -10)
