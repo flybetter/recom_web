@@ -26,7 +26,6 @@ def newhouse(phone, num):
     deviceids = r.smembers(PHONEDEVICE_PREFIX + phone)
     result = list()
     for deviceid in deviceids:
-        result = list()
         datas = r.lrange(NEWHOUSELOG_PREFIX + deviceid.decode('utf-8'), 0, num)
         for data in datas:
             result.extend(json.loads(data.decode('utf-8')))
@@ -37,16 +36,16 @@ def newhouse(phone, num):
 
 
 if __name__ == '__main__':
-    phone = '13851729904'
-    print(phone.replace(phone[4:7], '****'))
-    # deviceids = r.smembers(PHONEDEVICE_PREFIX + phone)
-    # for deviceid in deviceids:
-    #     print(deviceid.decode('utf-8'))
-    #     num = 30
-    #     result = list()
-    #     datas = r.lrange(NEWHOUSELOG_PREFIX + deviceid.decode('utf-8'), 0, num)
-    #     for data in datas:
-    #         print(data.decode('utf-8'))
-    #         result.extend(json.loads(data.decode('utf-8')))
-    #
-    #     print(json.dumps(result, ensure_ascii=False))
+    phone = '18652058969'
+    # print(phone.replace(phone[4:7], '****'))
+    deviceids = r.smembers(PHONEDEVICE_PREFIX + phone)
+    for deviceid in deviceids:
+        print(deviceid.decode('utf-8'))
+        num = 30
+        result = list()
+        datas = r.lrange(NEWHOUSELOG_PREFIX + deviceid.decode('utf-8'), 0, num)
+        for data in datas:
+            print(data.decode('utf-8'))
+            result.extend(json.loads(data.decode('utf-8')))
+
+        print(json.dumps(result, ensure_ascii=False))
